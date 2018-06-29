@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+{% load staticfiles %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>N2C Shift System</title>
+    <link rel="stylesheet" href="{% static 'w3.css' %}">
+    <style>
+        html, body, h1, h2, h3, h4, h5, h6, p {
+            font-family: 'Open Sans', sans-serif,
+             "Microsoft YaHei", "微软雅黑",
+             STXihei, "华文细黑",
+             serif;
+        }
+    </style>
+</head>
+<body class="w3-light-grey">
+<div class="w3-padding-large w3-container">
+    <div class="w3-center w3-container w3-padding-large">
+        <h1>N2C 管理系统</h1>
+    </div>
+
+    <div class="w3-card-4 w3-margin">
+        <div class="w3-container w3-blue-gray">
+            <h2>登录</h2>
+        </div>
+        <p>
+        {% csrf_token %}
+        {% if password_is_wrong %}
+            <div class="w3-container">
+                <h4>Authentication is Unsuccessful</h4>
+            </div>
+
+        {% endif %}
+        <form class="w3-container" action="" method="post">
+            {% csrf_token %}
+            <label>用户名</label>
+            {{ form.username }}
+            <p>
+            <label>密码</label>
+            {{ form.password }}
+            <p>
+            <input class="w3-btn w3-blue-gray w3-padding w3-block" type="submit" value="登录">
+        </form>
+    </div>
+</div>
+
+
+</body>
+</html>

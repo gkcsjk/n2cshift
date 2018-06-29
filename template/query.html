@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+{% load staticfiles %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>N2C Turnover Query</title>
+    <link rel="stylesheet" href="{% static 'w3.css' %}">
+    <style>
+        html, body, h1, h2, h3, h4, h5, h6, p {
+            font-family: 'Open Sans', sans-serif,
+             "Microsoft YaHei", "微软雅黑",
+             STXihei, "华文细黑",
+             serif;
+        }
+    </style>
+</head>
+<body class="w3-light-gray">
+
+<div class="w3-container w3-top w3-blue-gray w3-cell-row w3-padding w3-center">
+  <h1>N2C 账目查询系统</h1>
+  <p class="w3-right">欢迎, {{ user.username }}</p>
+</div>
+
+<div class="w3-light-grey" style="padding:80px 16px"></div>
+
+<div class="w3-margin">
+    <a class="w3-button w3-red" href="/manage/">返回</a>
+</div>
+
+<div class="w3-card-4 w3-margin">
+    <div class="w3-blue-grey w3-padding-small">
+        <h3>账目查询</h3>
+    </div>
+
+    <div class="w3-padding">
+        <br>
+        <p>如果只填写开始日期为查询该日期当天信息</p>
+        <form action="" method="post">
+            {% csrf_token %}
+            <div class="w3-cell-row">
+                <div class="w3-cell w3-container w3-section">
+                    <label>选择员工</label>
+                    {{ form.staff }}
+                </div>
+                <div class="w3-cell w3-container w3-section">
+                    <label>开始日期</label>
+                    {{ form.start_date }}
+                </div>
+                <div class="w3-cell w3-container w3-section">
+                    <label>截至日期</label>
+                    {{ form.end_date }}
+                </div>
+            </div>
+            <div class="w3-cell-row w3-container w3-section">
+                <input class="w3-button w3-right w3-blue-gray" type="submit" value="确认查询">
+            </div>
+        </form>
+        {% if query_staff_salary_unsuccessful %}
+            <p>查询出错！</p>
+        {% endif %}
+    </div>
+</div>
+
+{% if query_successful %}
+    <div class="w3-card-4 w3-margin">
+        <div class="w3-blue-grey w3-padding-small">
+            <h3>查询结果</h3>
+        </div>
+        <table class="w3-table-all">
+            <tr class="w3-blue-gray">
+                <th>日期</th>
+                <th>班次</th>
+                <th>员工</th>
+                <th>机器</th>
+                <th>现金</th>
+                <th>刷卡</th>
+                <th>支出</th>
+                <th>欠条</th>
+                <th>总计</th>
+                <th>备注</th>
+            </tr>
+            {% for item in result %}
+                <tr>
+                    <td>{{ item.date }}</td>
+                    <td>{{ item.shift }}</td>
+                    <td>{{ item.staff }}</td>
+                    <td>{{ item.machine }}</td>
+                    <td>{{ item.cash }}</td>
+                    <td>{{ item.card }}</td>
+                    <td>{{ item.receipts }}</td>
+                    <td>{{ item.IOU }}</td>
+                    <td>{{ item.total }}</td>
+                    <td><pre>{{ item.comments }}</pre></td>
+                </tr>
+            {% endfor %}
+        </table>
+    </div>
+
+{% endif %}
+
+<div class="w3-margin">
+    <a class="w3-button w3-red" href="/manage/">返回</a>
+</div>
+
+</body>
+</html>

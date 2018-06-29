@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+{% load staticfiles %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>N2C Salary Tool</title>
+    <link rel="stylesheet" href="{% static 'w3.css' %}">
+    <style>
+        html, body, h1, h2, h3, h4, h5, h6, p {
+            font-family: 'Open Sans', sans-serif,
+             "Microsoft YaHei", "微软雅黑",
+             STXihei, "华文细黑",
+             serif;
+        }
+    </style>
+</head>
+
+<body class="w3-light-grey">
+
+<div class="w3-container w3-top w3-blue-gray w3-cell-row w3-padding w3-center">
+  <h1>N2C 工资发放工具</h1>
+  <p class="w3-right">欢迎, {{ user.username }}</p>
+</div>
+
+<div class="w3-light-grey" style="padding:80px 16px"></div>
+
+<div class="w3-margin">
+    <a class="w3-button w3-red" href="/manage/">返回</a>
+</div>
+
+<div class="w3-card-4 w3-margin">
+    <div class="w3-blue-grey w3-padding-small">
+        <h3>工资查询</h3>
+    </div>
+
+    <div class="w3-padding">
+        <br>
+        <form action="" method="post">
+            {% csrf_token %}
+            <div class="w3-cell-row">
+                <div class="w3-cell w3-container w3-section">
+                    <label>起始日期</label>
+                    {{ form.start_date }}
+                </div>
+                <div class="w3-cell w3-container w3-section">
+                    <label>截止日期</label>
+                    {{ form.end_date }}
+                </div>
+            </div>
+            <br>
+            <div class="w3-cell-row">
+                <div class="w3-cell w3-container w3-section">
+                    {{ form.type }}
+                    <label>工资发放（写入数据库）</label>
+                </div>
+            </div>
+            <br>
+            <div class="w3-cell-row">
+                <div class="w3-cell w3-container w3-section">
+                    <label>修改总值</label>
+                    {{ form.change_total_to }}
+                </div>
+                <div class="w3-cell w3-container w3-section">
+                    <label>备注</label>
+                    {{ form.comments }}
+                </div>
+            </div>
+            <div class="w3-cell-row w3-container w3-section">
+                <input class="w3-button w3-right w3-blue-gray" type="submit" value="确认查询">
+            </div>
+        </form>
+        {% if query_staff_salary_unsuccessful %}
+            <p>查询出错！</p>
+        {% endif %}
+    </div>
+</div>
+
+{% if search_successful %}
+    <div class="w3-card-4 w3-margin">
+        <div class="w3-blue-grey w3-padding-small">
+            <h3>查询结果</h3>
+        </div>
+        <div class="w3-padding w3-section">
+            <h5>本周总计</h5>
+            <p>基础部分: {{ total_bscs }}</p>
+            <p>奖金部分: {{ total_bnss }}</p>
+            <p>总计: {{ total_tlls }}</p>
+            <p>实际发放: {{ change_tll_to }}</p>
+            <p>备注: {{ comments }}</p>
+            <p>由 {{ created_by }} 发放于 {{ created_time }}</p>
+        </div>
+    </div>
+
+    <div class="w3-card-4 w3-margin">
+        <table class="w3-table-all">
+            <tr class="w3-blue-gray">
+                <th>Staff</th>
+                <th>Basic Salary</th>
+                <th>Bonus Salary</th>
+                <th>Total Salary</th>
+            </tr>
+            {% for item in display %}
+                <tr>
+                    <td>{{ item.staff }}</td>
+                    <td>{{ item.basic_salary }}</td>
+                    <td>{{ item.bonus_salary }}</td>
+                    <td>{{ item.total_salary }}</td>
+                </tr>
+            {% endfor %}
+        </table>
+    </div>
+{% endif %}
+
+<div class="w3-margin">
+    <a class="w3-button w3-red" href="/manage/">返回</a>
+</div>
+
+</body>
+</html>

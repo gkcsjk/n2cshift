@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+{% load staticfiles %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Staff Profile</title>
+    <link rel="stylesheet" href="{% static 'w3.css' %}">
+    <style>
+        html, body, h1, h2, h3, h4, h5, h6, p {
+            font-family: 'Open Sans', sans-serif,
+             "Microsoft YaHei", "微软雅黑",
+             STXihei, "华文细黑",
+             serif;
+        }
+    </style>
+</head>
+
+<body class="w3-light-grey">
+
+<div class="w3-container w3-top w3-blue-gray w3-cell-row w3-padding w3-center">
+  <h1>用户资料</h1>
+</div>
+
+<div class="w3-light-grey" style="padding:64px 16px"></div>
+
+<div class="w3-margin">
+    <a class="w3-button w3-red" href="/">返回</a>
+</div>
+
+<div class="w3-card-4 w3-margin">
+    <div class="w3-blue-grey w3-padding-small">
+        <h3>用户信息</h3>
+    </div>
+    <div class="w3-padding">
+        <h5>用户名: {{ user }}</h5>
+    </div>
+
+    <div class="w3-padding">
+        <h5>修改密码</h5>
+        <p>注意：</p>
+        <p>1、如不修改请勿填写；</p>
+        <p>2、修改成功后会退出登录并自动跳转至登录页面；</p>
+        {% if change_unsuccessful %}
+            <p>修改密码失败！</p>
+        {% endif %}
+        <form action="/changepassword/" method="post">
+            {% csrf_token %}
+            <div class="w3-cell-row">
+                <div class="w3-cell w3-container w3-section">
+                    <label>旧密码:</label>
+                    {{ form.old_password }}
+                </div>
+                <div class="w3-cell w3-container w3-section">
+                        <label>新密码:</label>
+                    {{ form.new_password }}
+                </div>
+                <div class="w3-cell w3-container w3-section">
+                    <label>确认新密码:</label>
+                    {{ form.new_password_2 }}
+                </div>
+            </div>
+            <div class="w3-cell-row w3-container w3-section">
+                <input class="w3-button w3-right w3-blue-gray" type="submit" value="确认修改">
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="w3-card-4 w3-margin">
+    <div class="w3-blue-grey w3-padding-small">
+        <h3>工资查询</h3>
+    </div>
+
+    <div class="w3-padding">
+        <br>
+        <p>注意：</p>
+        <p>1、日期的区间以星期一为标准，请保证所查的星期的星期一在所填的日期区间内；</p>
+        <p>2、不填写日期直接点确认查询，查询所有；</p>
+        <form action="/staffquery/" method="post">
+            {% csrf_token %}
+            <div class="w3-cell-row">
+                <div class="w3-cell w3-container w3-section">
+                    <label>起始日期</label>
+                    {{ form2.start_date }}
+                </div>
+                <div class="w3-cell w3-container w3-section">
+                    <label>截止日期</label>
+                    {{ form2.end_date }}
+                </div>
+            </div>
+            <div class="w3-cell-row w3-container w3-section">
+                <input class="w3-button w3-right w3-blue-gray" type="submit" value="确认查询">
+            </div>
+        </form>
+        {% if query_staff_salary_unsuccessful %}
+            <p>查询出错！</p>
+        {% endif %}
+    </div>
+</div>
+
+{% if query_sucessful %}
+    <div class="w3-card-4 w3-margin">
+        <div class="w3-blue-grey w3-padding-small">
+            <h3>查询结果</h3>
+        </div>
+        <table class="w3-table">
+            <tr class="w3-blue-gray">
+                <th>起始日期</th>
+                <th>截至日期</th>
+                <th>发放日期</th>
+                <th>底薪</th>
+                <th>提成</th>
+                <th>合计</th>
+            </tr>
+            {% for item in display %}
+                <tr>
+                    <td>{{ item.from_date }}</td>
+                    <td>{{ item.to_date }}</td>
+                    <td>{{ item.release_date }}</td>
+                    <td>{{ item.basic_salary }}</td>
+                    <td>{{ item.bonus_salary }}</td>
+                    <td>{{ item.total_salary }}</td>
+                </tr>
+            {% endfor %}
+        </table>
+    </div>
+{% endif %}
+
+<div class="w3-margin">
+    <a class="w3-button w3-red" href="/">返回</a>
+</div>
+
+</body>
+</html>
