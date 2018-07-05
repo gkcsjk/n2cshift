@@ -5,6 +5,9 @@
     <meta charset="UTF-8">
     <title>N2C Shift</title>
     <link rel="stylesheet" href="{% static 'w3.css' %}">
+    <link rel="stylesheet" href="{% static 'jquery-ui.css' %}"/>
+    <script src="{% static 'jquery-1.12.4.js' %}"></script>
+    <script src="{% static 'jquery-ui.js' %}"></script>
     <style>
         html, body, h1, h2, h3, h4, h5, h6, p {
             font-family: 'Open Sans', sans-serif,
@@ -13,6 +16,13 @@
              serif;
         }
     </style>
+    <script>
+    $( function() {
+        $( "#datepicker" ).datepicker(
+            {dateFormat:"yy-mm-dd"}
+        );
+    } );
+  </script>
 </head>
 
 <body class="w3-light-grey" onload="document.getElementById('after_submit').style.display='block'" class="w3-button w3-xlarge w3-blue-gray w3-block">
@@ -45,12 +55,6 @@
     </div>
 </div>
 
-<div class="w3-container w3-padding">
-    <p>使用说明：</p>
-    <p>1、每次交班完成后请注销；</p>
-    <p>2、系统还在测试阶段，遇到bug及时联系我：0452516722；</p>
-    <p>3、在测试阶段时，信封还需要按以前格式写；</p>
-</div>
 
 
 {% if info %}
@@ -84,11 +88,11 @@
                 <span onclick="document.getElementById('shift_form').style.display='none'" class="w3-button w3-xlarge w3-transparent w3-display-topright" title="Close Modal">×</span>
 
             </div>
-            <form class="w3-container" action="" method="post">
+            <form class="w3-container" action="" method="post" autocomplete="off">
                 {% csrf_token %}
                 <div class="w3-cell-row">
                     <div class="w3-cell w3-container w3-section">
-                        <label>交班日期 (如：2017-11-11)</label>
+                        <label>交班日期</label>
                         {{ form.date }}
                     </div>
                     <div class="w3-cell w3-container w3-section">

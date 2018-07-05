@@ -26,7 +26,7 @@ class ShiftForm(forms.Form):
     date = forms.DateField(
         required=True,
         # label='Date (eg.2017-11-11)',
-        widget=forms.DateInput(attrs={'class': 'w3-input w3-border'})
+        widget=forms.DateInput(attrs={'class': 'w3-input w3-border', 'id': "datepicker"})
     )
     shift = forms.ChoiceField(
         required=True,
@@ -97,12 +97,12 @@ class QueryForm(forms.Form):
     start_date = forms.DateField(
         required=True,
         # label='Start date'
-        widget=forms.DateInput(attrs={'class': 'w3-input w3-border'})
+        widget=forms.DateInput(attrs={'class': 'w3-input w3-border', 'id': "datepicker"})
     )
     end_date = forms.DateField(
         required=False,
         # label='End date'
-        widget=forms.DateInput(attrs={'class': 'w3-input w3-border'})
+        widget=forms.DateInput(attrs={'class': 'w3-input w3-border', 'id': "datepicker1"})
     )
 
     def clean(self):
@@ -140,12 +140,12 @@ class StaffQueryForm(forms.Form):
     start_date = forms.DateField(
         # label='From',
         required=False,
-        widget=forms.DateInput(attrs={'class': 'w3-input w3-border'})
+        widget=forms.DateInput(attrs={'class': 'w3-input w3-border', 'id': "datepicker"})
     )
     end_date = forms.DateField(
         # label='To',
         required=False,
-        widget=forms.DateInput(attrs={'class': 'w3-input w3-border'})
+        widget=forms.DateInput(attrs={'class': 'w3-input w3-border', 'id': "datepicker1"})
     )
 
     def clean(self):
@@ -159,12 +159,12 @@ class SearchSalaryForm(forms.Form):
     start_date = forms.DateField(
         required=True,
         # label='Start Date'
-        widget=forms.DateInput(attrs={'class': 'w3-input w3-border'})
+        widget=forms.DateInput(attrs={'class': 'w3-input w3-border', 'id': "datepicker"})
     )
     end_date = forms.DateField(
         required=True,
         # label='End Date'
-        widget=forms.DateInput(attrs={'class': 'w3-input w3-border'})
+        widget=forms.DateInput(attrs={'class': 'w3-input w3-border', 'id': "datepicker1"})
     )
     type = forms.BooleanField(
         required=False,

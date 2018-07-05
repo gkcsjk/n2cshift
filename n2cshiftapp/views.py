@@ -15,7 +15,7 @@ import sys
 
 
 def index(request):
-    if not request.user.is_authenticated():
+    if not request.user.is_authenticated:
         return redirect('login')
     else:
         if request.method == 'GET':
@@ -24,7 +24,7 @@ def index(request):
                 'user': request.user,
                 'form': form,
                 'is_staff': request.user.is_staff
-            },)
+            }, )
         else:
             form = ShiftForm(request.POST)
             if form.is_valid():
@@ -43,11 +43,11 @@ def index(request):
                 mRecords.save()
                 return render(request, 'index.html', {'info': True})
             else:
-                return render(request, 'index.html', {'form': form ,'info': False})
+                return render(request, 'index.html', {'form': form, 'info': False})
 
 
 def login(request):
-    if request.user.is_authenticated():
+    if request.user.is_authenticated:
         return redirect('index')
 
     if request.method == 'GET':
@@ -59,7 +59,7 @@ def login(request):
         if form.is_valid():
             username = form.cleaned_data['username']
             password = form.cleaned_data['password']
-            user = auth.authenticate(username = username, password = password)
+            user = auth.authenticate(username=username, password=password)
             if user is not None:
                 auth.login(request, user)
                 # will logout after 1200 seconds
@@ -80,7 +80,7 @@ def logout(request):
 
 
 def profile(request):
-    if not request.user.is_authenticated():
+    if not request.user.is_authenticated:
         return redirect('login')
     else:
         if request.method == 'GET':
@@ -94,7 +94,7 @@ def profile(request):
 
 
 def changepw(request):
-    if not request.user.is_authenticated():
+    if not request.user.is_authenticated:
         return redirect('login')
     else:
         if request.method == 'POST':
@@ -104,7 +104,7 @@ def changepw(request):
                 old_password = form.cleaned_data['old_password']
                 new_password = form.cleaned_data['new_password']
                 new_password_2 = form.cleaned_data['new_password_2']
-                user = auth.authenticate(username = request.user.username, password = old_password)
+                user = auth.authenticate(username=request.user.username, password=old_password)
                 if user is not None and new_password == new_password_2:
                     user.set_password(new_password)
                     user.save()
@@ -122,11 +122,11 @@ def changepw(request):
                     'form': form,
                     'form2': form2,
                     'user': request.user.username
-            })
+                })
 
 
 def salary_staff_query(request):
-    if not request.user.is_authenticated():
+    if not request.user.is_authenticated:
         return redirect('login')
     else:
         if request.method == 'POST':
@@ -140,9 +140,9 @@ def salary_staff_query(request):
                     end_date = date.today()
                 if start_date is None:
                     results = StaffSalary.objects.filter(
-                    username=request.user,
-                    belongs_to__start_date__lte=end_date,
-                )
+                        username=request.user,
+                        belongs_to__start_date__lte=end_date,
+                    )
                 else:
                     results = StaffSalary.objects.filter(
                         username=request.user,
@@ -180,7 +180,7 @@ def salary_staff_query(request):
 
 
 def query(request):
-    if not request.user.is_authenticated():
+    if not request.user.is_authenticated:
         return redirect('login')
     else:
         if not request.user.is_staff:
@@ -228,10 +228,10 @@ def query(request):
                         item_dict['card'] = item.cards
                         item_dict['receipts'] = item.receipts
                         item_dict['IOU'] = item.IOUs
-                        item_dict['total'] = item.cash+item.cards+item.receipts+item.IOUs
+                        item_dict['total'] = item.cash + item.cards + item.receipts + item.IOUs
                         item_dict['comments'] = \
-                            '刷卡:'+item.cards_dtl\
-                            + '\n' + '支出:' + item.receipts_dtl\
+                            '刷卡:' + item.cards_dtl \
+                            + '\n' + '支出:' + item.receipts_dtl \
                             + '\n' + '欠条:' + item.IOUs_dtl
                         display.append(item_dict)
                     return render(request, 'query.html', {
@@ -250,7 +250,7 @@ def salary(request):
         return redirect('profile')
     if request.method == 'GET':
         form = SearchSalaryForm()
-        return render(request, 'salary.html', { 'form': form})
+        return render(request, 'salary.html', {'form': form})
     else:
         form = SearchSalaryForm(request.POST)
         if form.is_valid():
@@ -265,7 +265,7 @@ def salary(request):
 
             # IF Not Select write into database
             if not type:
-                print "Load records from database"
+                print("Load records from database")
                 mySalary = Salary.objects.get(start_date=start_date)
                 created_by = mySalary.created_user.username
                 created_time = mySalary.created_time
@@ -290,7 +290,6 @@ def salary(request):
             else:
                 # IF This week has NOT been recorded
                 if not Salary.objects.filter(start_date=start_date):
-                    print "create salary and staffsalary from records"
                     # Each User Salary
                     for user in myutils.list_user_to_list():
                         user_basic_salary = Decimal(0)
@@ -309,13 +308,13 @@ def salary(request):
                             shift = record.shift
                             salary_rate = UserInfo.objects.get(user__username=user).salary_rate
                             threshold, hours, rate, salary_limit = myutils.bonus_threshold(weekday, shift, salary_rate)
-                            basic_salary = hours*rate
+                            basic_salary = hours * rate
                             sys.stderr.write('msg')
                             if turnover < threshold[0]:
                                 bonus_salary = Decimal(0)
-                            elif turnover >= threshold[0] and turnover < threshold[1]:
+                            elif threshold[0] <= turnover < threshold[1]:
                                 bonus_salary = salary_limit[0]
-                            elif turnover >= threshold[1] and turnover < threshold[2]:
+                            elif threshold[1] <= turnover < threshold[2]:
                                 bonus_salary = salary_limit[1]
                             else:
                                 bonus_salary = salary_limit[2]
@@ -342,7 +341,6 @@ def salary(request):
 
                 # IF This week has been recorded already
                 else:
-                    print "Load records from database"
                     mySalary = Salary.objects.get(start_date=start_date)
                     created_by = mySalary.created_user.username
                     created_time = mySalary.created_time
