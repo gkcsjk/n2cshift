@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+{% load staticfiles %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>N2C Salary Query</title>
+    <link rel="stylesheet" href="{% static 'w3.css' %}">
+    <link rel="stylesheet" href="{% static 'jquery-ui.css' %}"/>
+    <script src="{% static 'jquery-1.12.4.js' %}"></script>
+    <script src="{% static 'jquery-ui.js' %}"></script>
+    <style>
+        html, body, h1, h2, h3, h4, h5, h6, p {
+            font-family: 'Open Sans', sans-serif,
+             "Microsoft YaHei", "微软雅黑",
+             STXihei, "华文细黑",
+             serif;
+        }
+    </style>
+    <script>
+    $( function() {
+        $( "#datepicker" ).datepicker(
+            {dateFormat:"yy-mm-dd"}
+        );
+        $( "#datepicker1" ).datepicker(
+            {dateFormat:"yy-mm-dd"}
+        );
+    } );
+    </script>
+</head>
+
+
+<body class="w3-light-grey">
+
+<div class="w3-container w3-top w3-blue-gray w3-cell-row w3-padding w3-center">
+  <h1>N2C 工资查询工具</h1>
+  <p class="w3-right">欢迎, {{ user.username }}</p>
+</div>
+
+<div class="w3-light-grey" style="padding:80px 16px"></div>
+
+<div class="w3-margin">
+    <a class="w3-button w3-red" href="/manage/">返回</a>
+</div>
+
+<div class="w3-card-4 w3-margin">
+    <div class="w3-blue-grey w3-padding-small">
+        <h3>工资查询</h3>
+    </div>
+
+    <div class="w3-padding">
+        <br>
+        <form action="" method="post" autocomplete="off">
+            {% csrf_token %}
+            <div class="w3-cell-row">
+                <div class="w3-cell w3-container w3-section">
+                    <label>起始日期</label>
+                    {{ form.start_date }}
+                </div>
+                <div class="w3-cell w3-container w3-section">
+                    <label>截止日期</label>
+                    {{ form.end_date }}
+                </div>
+            </div>
+            <div class="w3-cell-row w3-container w3-section">
+                <input class="w3-button w3-right w3-blue-gray" type="submit" value="确认查询">
+            </div>
+        </form>
+        {% if query_staff_salary_unsuccessful %}
+            <p>查询出错！</p>
+        {% endif %}
+    </div>
+</div>
+
+{% if query_successful %}
+
+    <div class="w3-card-4 w3-margin">
+        <table class="w3-table-all">
+            <tr class="w3-blue-gray">
+                <th>发放时间</th>
+                <th>周一日期</th>
+                <th>发放人</th>
+                <th>基本工资</th>
+                <th>基本提成</th>
+                <th>应发工资</th>
+                <th>实发工资</th>
+                <th>备注</th>
+            </tr>
+            {% for item in result %}
+                <tr>
+                    <td>{{ item.createTime }}</td>
+                    <td>{{ item.start }}</td>
+                    <td>{{ item.createBy }}</td>
+                    <td>{{ item.basic }}</td>
+                    <td>{{ item.bonus }}</td>
+                    <td>{{ item.total }}</td>
+                    <td><b>{{ item.actual }}</b></td>
+                    <td>{{ item.comments }}</td>
+                </tr>
+            {% endfor %}
+        </table>
+    </div>
+{% endif %}
+
+<div class="w3-margin">
+    <a class="w3-button w3-red" href="/manage/">返回</a>
+</div>
+
+</body>
+</html>

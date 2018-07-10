@@ -82,6 +82,7 @@
         <table class="w3-table-all">
             <tr class="w3-blue-gray">
                 <th>日期</th>
+                <th>周次</th>
                 <th>班次</th>
                 <th>员工</th>
                 <th>机器</th>
@@ -94,7 +95,8 @@
             </tr>
             {% for item in result %}
                 <tr>
-                    <td>{{ item.date }}</td>
+                    <td>{{ item.date|date:"d.M" }}</td>
+                    <td>{{ item.date|date:"D" }}</td>
                     <td>{{ item.shift }}</td>
                     <td>{{ item.staff }}</td>
                     <td>{{ item.machine }}</td>
@@ -103,7 +105,7 @@
                     <td>{{ item.receipts }}</td>
                     <td>{{ item.IOU }}</td>
                     <td>{{ item.total }}</td>
-                    <td><pre>{{ item.comments }}</pre></td>
+                    <td>{{ item.comments }}</td>
                 </tr>
             {% endfor %}
         </table>

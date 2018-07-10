@@ -43,7 +43,7 @@
 
 <div class="w3-card-4 w3-margin">
     <div class="w3-blue-grey w3-padding-small">
-        <h3>工资查询</h3>
+        <h3>工资发放</h3>
     </div>
 
     <div class="w3-padding">
@@ -52,12 +52,8 @@
             {% csrf_token %}
             <div class="w3-cell-row">
                 <div class="w3-cell w3-container w3-section">
-                    <label>起始日期</label>
+                    <label>周一日期</label>
                     {{ form.start_date }}
-                </div>
-                <div class="w3-cell w3-container w3-section">
-                    <label>截止日期</label>
-                    {{ form.end_date }}
                 </div>
             </div>
             <br>

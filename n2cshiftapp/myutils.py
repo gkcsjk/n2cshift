@@ -1,12 +1,12 @@
 from django.contrib.auth.models import User
-from .models import Salary, StaffSalary
+from .models import Salary, StaffSalary, Threshold
 from datetime import timedelta
 from decimal import Decimal
 
 
 def list_user_to_tuple():
     users = ()
-    for user in User.objects.all():
+    for user in User.objects.filter(is_active=True):
         if not user.is_staff:
             users = ((user.username, user.username),) + users
     users = (('all', 'all'),) + users
@@ -15,29 +15,30 @@ def list_user_to_tuple():
 
 def list_user_to_list():
     users = []
-    for user in User.objects.all():
+    for user in User.objects.filter(is_active=True):
         if not user.is_staff:
             users.append(user.username)
     return users
 
 
-def bonus_threshold( weekday, shift, rate):
+def bonus_threshold(weekday, shift, rate):
+    my_threshold = Threshold.objects.get(is_active=True)
     threshold = {
         'Morning': {
-            'weekdays': [Decimal(300), Decimal(400), Decimal(800)],
-            'weekends': [Decimal(600), Decimal(700), Decimal(1100)],
+            'weekdays': [my_threshold.wks_m_10, my_threshold.wks_m_20, my_threshold.wks_m_50],
+            'weekends': [my_threshold.wkd_m_10, my_threshold.wkd_m_20, my_threshold.wkd_m_50],
             'hours': 7,
             'rate': rate,
         },
         'Dusk': {
-            'weekdays': [Decimal(700), Decimal(800), Decimal(1200)],
-            'weekends': [Decimal(900), Decimal(1000), Decimal(1400)],
+            'weekdays': [my_threshold.wks_d_10, my_threshold.wks_d_20, my_threshold.wks_d_50],
+            'weekends': [my_threshold.wkd_d_10, my_threshold.wkd_d_20, my_threshold.wkd_d_50],
             'hours': 7,
             'rate': rate,
         },
-        'Night':{
-            'weekdays': [Decimal(300), Decimal(400), Decimal(800)],
-            'weekends': [Decimal(400), Decimal(500), Decimal(1000)],
+        'Night': {
+            'weekdays': [my_threshold.wks_n_10, my_threshold.wks_n_20, my_threshold.wks_n_50],
+            'weekends': [my_threshold.wkd_n_10, my_threshold.wkd_n_20, my_threshold.wkd_n_50],
             'hours': 10,
             'rate': rate + 1,
         },
@@ -49,8 +50,8 @@ def bonus_threshold( weekday, shift, rate):
     th = threshold[shift][wd]
     h = threshold[shift]['hours']
     r = threshold[shift]['rate']
-    sl = [Decimal(10),Decimal(20),Decimal(50)]
-    return th, h ,r, sl
+    sl = [Decimal(10), Decimal(20), Decimal(50)]
+    return th, h, r, sl
 
 
 def save_salary_records(display, startdate, user):

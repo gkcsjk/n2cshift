@@ -155,16 +155,12 @@ class StaffQueryForm(forms.Form):
             cleaned_data = super(StaffQueryForm, self).clean()
 
 
+# How much to pay
 class SearchSalaryForm(forms.Form):
     start_date = forms.DateField(
         required=True,
         # label='Start Date'
         widget=forms.DateInput(attrs={'class': 'w3-input w3-border', 'id': "datepicker"})
-    )
-    end_date = forms.DateField(
-        required=True,
-        # label='End Date'
-        widget=forms.DateInput(attrs={'class': 'w3-input w3-border', 'id': "datepicker1"})
     )
     type = forms.BooleanField(
         required=False,
@@ -186,3 +182,22 @@ class SearchSalaryForm(forms.Form):
             raise forms.ValidationError("Input is Invalid!")
         else:
             cleaned_data = super(SearchSalaryForm, self).clean()
+
+
+# How much paid
+class QuerySalaryForm(forms.Form):
+    start_date = forms.DateField(
+        required=True,
+        widget=forms.DateInput(attrs={'class': 'w3-input w3-border', 'id': "datepicker"})
+    )
+    end_date = forms.DateField(
+        required=False,
+        widget=forms.DateInput(attrs={'class': 'w3-input w3-border', 'id': "datepicker1"})
+    )
+
+    def clean(self):
+        if not self.is_valid():
+            raise forms.ValidationError("Input is Invalid!")
+        else:
+            cleaned_data = super(QuerySalaryForm, self).clean()
+

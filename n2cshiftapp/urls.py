@@ -11,4 +11,6 @@ urlpatterns = [
     url(r'^salary', views.salary, name='salary'),
     url(r'^staffquery', views.salary_staff_query, name='staffquery'),
     url(r'^manage', views.manage, name='manage'),
+    url(r'^qsalary', views.query_salary, name='querysalary'),
+    url(r'setthreshold', views.set_threshold, name='setthreshold'),
 ]

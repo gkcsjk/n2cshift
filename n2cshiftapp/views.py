@@ -135,7 +135,7 @@ def salary_staff_query(request):
             form2 = StaffQueryForm(request.POST)
             if form2.is_valid():
                 start_date = form2.cleaned_data['start_date']
-                end_date = form2.cleaned_data['end_date']
+                end_date = form2.cleaned_data['choose_threshold']
                 if end_date is None:
                     end_date = date.today()
                 if start_date is None:
@@ -197,7 +197,7 @@ def query(request):
                 if form.is_valid():
                     staff = form.cleaned_data['staff']
                     start_date = form.cleaned_data['start_date']
-                    end_date = form.cleaned_data['end_date']
+                    end_date = form.cleaned_data['choose_threshold']
                     if end_date is None:
                         if staff == 'all':
                             result = Records.objects.filter(created_time=start_date)
@@ -231,8 +231,8 @@ def query(request):
                         item_dict['total'] = item.cash + item.cards + item.receipts + item.IOUs
                         item_dict['comments'] = \
                             '刷卡:' + item.cards_dtl \
-                            + '\n' + '支出:' + item.receipts_dtl \
-                            + '\n' + '欠条:' + item.IOUs_dtl
+                            + '; ' + '支出:' + item.receipts_dtl \
+                            + '; ' + '欠条:' + item.IOUs_dtl
                         display.append(item_dict)
                     return render(request, 'query.html', {
                         'form': form,
@@ -255,7 +255,7 @@ def salary(request):
         form = SearchSalaryForm(request.POST)
         if form.is_valid():
             start_date = form.cleaned_data['start_date']
-            end_date = form.cleaned_data['end_date']
+            end_date = start_date + timedelta(days=6)
             change_total_to = form.cleaned_data['change_total_to']
             comments = form.cleaned_data['comments']
             type = form.cleaned_data['type']
@@ -388,6 +388,52 @@ def salary(request):
             return render(request, 'salary.html', {'form': form})
 
 
+def query_salary(request):
+    if not request.user.is_authenticated:
+        return redirect('login')
+    if not request.user.is_staff:
+        return redirect('profile')
+    if request.method == 'GET':
+        form = QuerySalaryForm()
+        return render(request, 'paid.html', {
+            'user': request.user.username,
+            'form': form,
+        })
+    else:
+        form = QuerySalaryForm(request.POST)
+        if form.is_valid():
+            start_date = form.cleaned_data['start_date']
+            end_date = form.cleaned_data['choose_threshold']
+            if end_date is None:
+                results = Salary.objects.filter(created_time__gte=start_date)
+            else:
+                results = Salary.objects.filter(
+                    created_time__gte=start_date,
+                    created_time__lte=end_date,
+                )
+            results = results.order_by('created_time').reverse()
+            display = []
+
+            for result in results:
+                item_dict = {}
+                item_dict['start'] = result.start_date
+                item_dict['createTime'] = result.created_time
+                item_dict['createBy'] = result.created_user
+                item_dict['basic'] = result.basic_salary
+                item_dict['bonus'] = result.bonus_salary
+                item_dict['total'] = result.total_salary
+                item_dict['actual'] = result.actual_salary
+                item_dict['comments'] = result.comments
+                display.append(item_dict)
+            return render(request, 'paid.html', {
+                'form': form,
+                'result': display,
+                'query_successful': True,
+            })
+        else:
+            return render(request, 'paid.html', {'form': form})
+
+
 def manage(request):
     if not request.user.is_authenticated:
         return redirect('login')
@@ -397,3 +443,17 @@ def manage(request):
         return render(request, 'manage.html', {
             'user': request.user.username,
         })
+
+
+def set_threshold(request):
+    if not request.user.is_authenticated:
+        return redirect('login')
+    if not request.user.is_staff:
+        return redirect('profile')
+    results = Threshold.objects.order_by('create_time')
+    if request.method == 'GET':
+        return render(request, 'threshold.html', {
+            'user': request.user.username,
+            'result': results,
+        })
+

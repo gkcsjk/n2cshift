@@ -5,8 +5,30 @@ from django.contrib import admin
 
 from .models import *
 
-admin.site.register(Records)
-admin.site.register(Salary)
-admin.site.register(StaffSalary)
-admin.site.register(UserInfo)
 
+class RecordsAdmin(admin.ModelAdmin):
+    list_display = ('created_user', 'created_time', 'shift', 'machine')
+    list_display_links = ('created_user', 'created_time')
+    list_per_page = 21
+
+
+class SalaryAdmin(admin.ModelAdmin):
+    list_per_page = 5
+    list_display = ('created_time', 'start_date', 'actual_salary')
+
+
+class UserInfoAdmin(admin.ModelAdmin):
+    list_per_page = 50
+    list_display = ('user', 'salary_rate')
+
+
+class ThreshHoldAdmin(admin.ModelAdmin):
+    list_display = ('threshold_name', 'is_active')
+    list_per_page = 50
+
+
+admin.site.register(Records, RecordsAdmin)
+admin.site.register(Salary, SalaryAdmin)
+admin.site.register(StaffSalary)
+admin.site.register(UserInfo, UserInfoAdmin)
+admin.site.register(Threshold, ThreshHoldAdmin)

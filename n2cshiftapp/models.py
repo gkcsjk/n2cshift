@@ -45,4 +45,25 @@ class StaffSalary(models.Model):
     total_salary = models.DecimalField(max_digits=6, decimal_places=2)
 
 
-
+class Threshold(models.Model):
+    threshold_name = models.CharField(primary_key=True, max_length=20)
+    create_time = models.DateField(default=date.today)
+    is_active = models.BooleanField(default=False)
+    wks_m_10 = models.DecimalField(max_digits=4, decimal_places=0)
+    wks_m_20 = models.DecimalField(max_digits=4, decimal_places=0)
+    wks_m_50 = models.DecimalField(max_digits=4, decimal_places=0)
+    wks_d_10 = models.DecimalField(max_digits=4, decimal_places=0)
+    wks_d_20 = models.DecimalField(max_digits=4, decimal_places=0)
+    wks_d_50 = models.DecimalField(max_digits=4, decimal_places=0)
+    wks_n_10 = models.DecimalField(max_digits=4, decimal_places=0)
+    wks_n_20 = models.DecimalField(max_digits=4, decimal_places=0)
+    wks_n_50 = models.DecimalField(max_digits=4, decimal_places=0)
+    wkd_m_10 = models.DecimalField(max_digits=4, decimal_places=0)
+    wkd_m_20 = models.DecimalField(max_digits=4, decimal_places=0)
+    wkd_m_50 = models.DecimalField(max_digits=4, decimal_places=0)
+    wkd_d_10 = models.DecimalField(max_digits=4, decimal_places=0)
+    wkd_d_20 = models.DecimalField(max_digits=4, decimal_places=0)
+    wkd_d_50 = models.DecimalField(max_digits=4, decimal_places=0)
+    wkd_n_10 = models.DecimalField(max_digits=4, decimal_places=0)
+    wkd_n_20 = models.DecimalField(max_digits=4, decimal_places=0)
+    wkd_n_50 = models.DecimalField(max_digits=4, decimal_places=0)
