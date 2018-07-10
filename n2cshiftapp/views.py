@@ -41,9 +41,19 @@ def index(request):
                 mRecords.receipts_dtl = form.cleaned_data['receipts_dtl']
                 mRecords.IOUs_dtl = form.cleaned_data['IOUs_dtl']
                 mRecords.save()
-                return render(request, 'index.html', {'info': True})
+                return render(request, 'index.html', {
+                    'info': True,
+                    'user': request.user,
+                    'form': form,
+                    'is_staff': request.user.is_staff
+                })
             else:
-                return render(request, 'index.html', {'form': form, 'info': False})
+                return render(request, 'index.html', {
+                    'form': form,
+                    'info': False,
+                    'user': request.user,
+                    'is_staff': request.user.is_staff
+                })
 
 
 def login(request):
@@ -135,7 +145,7 @@ def salary_staff_query(request):
             form2 = StaffQueryForm(request.POST)
             if form2.is_valid():
                 start_date = form2.cleaned_data['start_date']
-                end_date = form2.cleaned_data['choose_threshold']
+                end_date = form2.cleaned_data['end_date']
                 if end_date is None:
                     end_date = date.today()
                 if start_date is None:
@@ -197,7 +207,7 @@ def query(request):
                 if form.is_valid():
                     staff = form.cleaned_data['staff']
                     start_date = form.cleaned_data['start_date']
-                    end_date = form.cleaned_data['choose_threshold']
+                    end_date = form.cleaned_data['end_date']
                     if end_date is None:
                         if staff == 'all':
                             result = Records.objects.filter(created_time=start_date)
@@ -403,7 +413,7 @@ def query_salary(request):
         form = QuerySalaryForm(request.POST)
         if form.is_valid():
             start_date = form.cleaned_data['start_date']
-            end_date = form.cleaned_data['choose_threshold']
+            end_date = form.cleaned_data['end_date']
             if end_date is None:
                 results = Salary.objects.filter(created_time__gte=start_date)
             else:
