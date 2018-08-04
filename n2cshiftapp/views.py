@@ -73,7 +73,7 @@ def login(request):
             if user is not None:
                 auth.login(request, user)
                 # will logout after 1200 seconds
-                request.session.set_expiry(1200)
+                request.session.set_expiry(3600)
                 return redirect('index')
             else:
                 return render(request, 'registration/login.html', {
