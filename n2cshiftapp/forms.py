@@ -79,6 +79,11 @@ class ShiftForm(forms.Form):
         # label='Details of IOUs',
         widget=forms.TextInput(attrs={'class': 'w3-input w3-border'})
     )
+    if_bdgame = forms.BooleanField(
+        required=False,
+        widget=forms.CheckboxInput(attrs={'class': 'w3-check w3-border'})
+    )
+
 
     def clean(self):
         if not self.is_valid():

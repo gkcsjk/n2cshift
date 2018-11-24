@@ -41,6 +41,15 @@ def index(request):
                 mRecords.receipts_dtl = form.cleaned_data['receipts_dtl']
                 mRecords.IOUs_dtl = form.cleaned_data['IOUs_dtl']
                 mRecords.save()
+                if form.cleaned_data['if_bdgame']:
+                    mRecords_bd = Records()
+                    mRecords_bd.created_user = request.user
+                    mRecords_bd.created_time = form.cleaned_data['date']
+                    mRecords_bd.shift = 'Boardgames'
+                    mRecords_bd.cash = request.POST['bd_cash']
+                    mRecords_bd.cards = request.POST['bd_cards']
+                    mRecords_bd.save()
+
                 return render(request, 'index.html', {
                     'info': True,
                     'user': request.user,
@@ -316,6 +325,8 @@ def salary(request):
                             turnover = record.machine
                             weekday = record.created_time.isoweekday()
                             shift = record.shift
+                            if shift == "Boardgames":
+                                continue
                             salary_rate = UserInfo.objects.get(user__username=user).salary_rate
                             threshold, hours, rate, salary_limit = myutils.bonus_threshold(weekday, shift, salary_rate)
                             basic_salary = hours * rate
