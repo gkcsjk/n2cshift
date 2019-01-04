@@ -237,17 +237,21 @@ def query(request):
                     result = result.order_by('created_time')
                     display = []
 
+                    machine_total = 0
+                    total = 0
                     for item in result:
                         item_dict = {}
                         item_dict['staff'] = item.created_user
                         item_dict['date'] = item.created_time
                         item_dict['shift'] = item.shift
                         item_dict['machine'] = item.machine
+                        machine_total += item.machine
                         item_dict['cash'] = item.cash
                         item_dict['card'] = item.cards
                         item_dict['receipts'] = item.receipts
                         item_dict['IOU'] = item.IOUs
                         item_dict['total'] = item.cash + item.cards + item.receipts + item.IOUs
+                        total += item.cash + item.cards + item.receipts + item.IOUs
                         item_dict['comments'] = \
                             '刷卡:' + item.cards_dtl \
                             + '; ' + '支出:' + item.receipts_dtl \
@@ -257,6 +261,9 @@ def query(request):
                         'form': form,
                         'result': display,
                         'query_successful': True,
+                        'total': total,
+                        'machine_total': machine_total,
+                        'difference': total - machine_total,
                     })
                 else:
                     return render(request, 'query.html', {'form': form})
