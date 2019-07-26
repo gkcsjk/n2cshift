@@ -84,7 +84,6 @@ class ShiftForm(forms.Form):
         widget=forms.CheckboxInput(attrs={'class': 'w3-check w3-border'})
     )
 
-
     def clean(self):
         if not self.is_valid():
             raise forms.ValidationError("Input is Invalid!")
@@ -93,10 +92,10 @@ class ShiftForm(forms.Form):
 
 
 class QueryForm(forms.Form):
-    staff = forms.ChoiceField(
+    staff = forms.ModelChoiceField(
         # label='Choose staff',
         required=False,
-        choices=myutils.list_user_to_tuple(),
+        queryset=myutils.queryset_user_active(),
         widget=forms.Select(attrs={'class': 'w3-input w3-border'})
     )
     start_date = forms.DateField(
@@ -108,6 +107,11 @@ class QueryForm(forms.Form):
         required=False,
         # label='End date'
         widget=forms.DateInput(attrs={'class': 'w3-input w3-border', 'id': "datepicker1"})
+    )
+    board_game = forms.BooleanField(
+        widget=forms.CheckboxInput(attrs={'class': 'w3-check w3-border'}),
+        initial=True,
+        required=False,
     )
 
     def clean(self):

@@ -217,23 +217,43 @@ def query(request):
                     staff = form.cleaned_data['staff']
                     start_date = form.cleaned_data['start_date']
                     end_date = form.cleaned_data['end_date']
+                    board_game = form.cleaned_data['board_game']
                     if end_date is None:
-                        if staff == 'all':
-                            result = Records.objects.filter(created_time=start_date)
+                        if staff is None:
+                            if board_game:
+                                result = Records.objects.filter(created_time=start_date)
+                            else:
+                                result = Records.objects.filter(created_time=start_date).exclude(shift='Boardgames')
                         else:
-                            result = Records.objects.filter(created_user__username__contains=staff)
+                            if board_game:
+                                result = Records.objects.filter(created_user__username__contains=staff)
+                            else:
+                                result = Records.objects.filter(created_user__username__contains=staff).exclude(shift='Boardgames')
                     else:
-                        if staff == 'all':
-                            result = Records.objects.filter(
-                                created_time__gte=start_date,
-                                created_time__lte=end_date,
-                            )
+                        if staff is None:
+                            if board_game:
+                                result = Records.objects.filter(
+                                    created_time__gte=start_date,
+                                    created_time__lte=end_date,
+                                )
+                            else:
+                                result = Records.objects.filter(
+                                    created_time__gte=start_date,
+                                    created_time__lte=end_date,
+                                ).exclude(shift='Boardgames')
                         else:
-                            result = Records.objects.filter(
-                                created_time__gte=start_date,
-                                created_time__lte=end_date,
-                                created_user__username__contains=staff,
-                            )
+                            if board_game:
+                                result = Records.objects.filter(
+                                    created_time__gte=start_date,
+                                    created_time__lte=end_date,
+                                    created_user__username__contains=staff,
+                                )
+                            else:
+                                result = Records.objects.filter(
+                                    created_time__gte=start_date,
+                                    created_time__lte=end_date,
+                                    created_user__username__contains=staff,
+                                ).exclude(shift='Boardgames')
                     result = result.order_by('created_time')
                     display = []
 

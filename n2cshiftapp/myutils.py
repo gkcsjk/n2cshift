@@ -21,6 +21,10 @@ def list_user_to_list():
     return users
 
 
+def queryset_user_active():
+    return User.objects.filter(is_active=True)
+
+
 def bonus_threshold(weekday, shift, rate):
     my_threshold = Threshold.objects.get(is_active=True)
     threshold = {
