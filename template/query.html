@@ -65,12 +65,15 @@
                     {{ form.end_date }}
                 </div>
                 <div class="w3-cell w3-container w3-section">
-                    <label>显示桌游</label>
                     {{ form.board_game }}
                 </div>
             </div>
             <div class="w3-cell-row w3-container w3-section">
-                <input class="w3-button w3-right w3-blue-gray" type="submit" value="确认查询">
+                <input class="w3-button w3-right w3-blue-gray" name="submit" type="submit" value="确认查询">
+            </div>
+            <div class="w3-cell-row w3-container w3-section">
+                <input class="w3-button w3-right w3-blue-gray" id="export" name="submit" type="submit" value="导出记录">
+                <small>导出时勾选“不显示桌游”</small>
             </div>
         </form>
         {% if query_staff_salary_unsuccessful %}

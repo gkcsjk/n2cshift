@@ -27,8 +27,12 @@ class ThreshHoldAdmin(admin.ModelAdmin):
     list_per_page = 50
 
 
+class StaffSalaryAdmin(admin.ModelAdmin):
+    list_display = ('username', 'belongs_to', 'basic_salary', 'bonus_salary', 'total_salary')
+
+
 admin.site.register(Records, RecordsAdmin)
 admin.site.register(Salary, SalaryAdmin)
-admin.site.register(StaffSalary)
+admin.site.register(StaffSalary, StaffSalaryAdmin)
 admin.site.register(UserInfo, UserInfoAdmin)
 admin.site.register(Threshold, ThreshHoldAdmin)

@@ -1,6 +1,6 @@
 from django.contrib.auth.models import User
 from .models import Salary, StaffSalary, Threshold
-from datetime import timedelta
+from datetime import timedelta, datetime
 from decimal import Decimal
 
 
@@ -19,6 +19,10 @@ def list_user_to_list():
         if not user.is_staff:
             users.append(user.username)
     return users
+
+
+def queryset_all_recent_users(start_date):
+    return User.objects.filter(is_staff=False, last_login__gte=start_date)
 
 
 def queryset_user_active():
@@ -85,7 +89,9 @@ def save_staff_salary_records(display, startdate):
         mStaffSalary = StaffSalary()
         mStaffSalary.username = User.objects.get(username=item['staff'])
         mStaffSalary.belongs_to = Salary.objects.get(start_date=startdate)
+        mStaffSalary.hours = item['hours']
         mStaffSalary.basic_salary = item['basic_salary']
         mStaffSalary.bonus_salary = item['bonus_salary']
         mStaffSalary.total_salary = item['total_salary']
         mStaffSalary.save()
+

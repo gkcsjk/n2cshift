@@ -40,6 +40,7 @@ class Salary(models.Model):
 class StaffSalary(models.Model):
     username = models.ForeignKey(User, on_delete=models.CASCADE)
     belongs_to = models.ForeignKey(Salary, on_delete=models.CASCADE)
+    hours = models.IntegerField(default=0)
     basic_salary = models.DecimalField(max_digits=6, decimal_places=2)
     bonus_salary = models.DecimalField(max_digits=6, decimal_places=2)
     total_salary = models.DecimalField(max_digits=6, decimal_places=2)

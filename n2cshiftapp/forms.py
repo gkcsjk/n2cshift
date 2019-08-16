@@ -108,10 +108,14 @@ class QueryForm(forms.Form):
         # label='End date'
         widget=forms.DateInput(attrs={'class': 'w3-input w3-border', 'id': "datepicker1"})
     )
-    board_game = forms.BooleanField(
-        widget=forms.CheckboxInput(attrs={'class': 'w3-check w3-border'}),
-        initial=True,
-        required=False,
+    board_game = forms.ChoiceField(
+        choices=[
+            ('no', '不显示桌游'),
+            ('yes', '显示桌游'),
+            ('only', '只显示桌游')
+        ],
+        widget=forms.RadioSelect(),
+        initial='no',
     )
 
     def clean(self):

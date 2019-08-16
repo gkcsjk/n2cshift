@@ -3,14 +3,15 @@ from __future__ import unicode_literals
 
 from datetime import timedelta, date
 from decimal import *
-
+import csv
+from django.http import HttpResponse
 from django.contrib import auth
 from django.shortcuts import render, redirect
 from django.contrib import messages
+from django.utils.encoding import smart_str
 from n2cshiftapp import myutils
 from .forms import *
 from .models import *
-
 import sys
 
 
@@ -220,21 +221,34 @@ def query(request):
                     board_game = form.cleaned_data['board_game']
                     if end_date is None:
                         if staff is None:
-                            if board_game:
+                            if board_game == 'yes':
                                 result = Records.objects.filter(created_time=start_date)
+                            elif board_game == 'only':
+                                result = Records.objects.filter(created_time=start_date, shift='Boardgames')
                             else:
                                 result = Records.objects.filter(created_time=start_date).exclude(shift='Boardgames')
                         else:
-                            if board_game:
+                            if board_game == 'yes':
                                 result = Records.objects.filter(created_user__username__contains=staff)
+                            elif board_game == 'only':
+                                result = Records.objects.filter(
+                                    created_user__username__contains=staff,
+                                    shift='Boardgames'
+                                )
                             else:
                                 result = Records.objects.filter(created_user__username__contains=staff).exclude(shift='Boardgames')
                     else:
                         if staff is None:
-                            if board_game:
+                            if board_game == 'yes':
                                 result = Records.objects.filter(
                                     created_time__gte=start_date,
                                     created_time__lte=end_date,
+                                )
+                            elif board_game == 'only':
+                                result = Records.objects.filter(
+                                    created_time__gte=start_date,
+                                    created_time__lte=end_date,
+                                    shift='Boardgames'
                                 )
                             else:
                                 result = Records.objects.filter(
@@ -242,11 +256,18 @@ def query(request):
                                     created_time__lte=end_date,
                                 ).exclude(shift='Boardgames')
                         else:
-                            if board_game:
+                            if board_game == 'yes':
                                 result = Records.objects.filter(
                                     created_time__gte=start_date,
                                     created_time__lte=end_date,
                                     created_user__username__contains=staff,
+                                )
+                            elif board_game == 'only':
+                                result = Records.objects.filter(
+                                    created_time__gte=start_date,
+                                    created_time__lte=end_date,
+                                    created_user__username__contains=staff,
+                                    shift='Boardgames'
                                 )
                             else:
                                 result = Records.objects.filter(
@@ -277,6 +298,63 @@ def query(request):
                             + '; ' + '支出:' + item.receipts_dtl \
                             + '; ' + '欠条:' + item.IOUs_dtl
                         display.append(item_dict)
+
+                    if request.POST.get('submit', None) == '导出记录':
+                        response = HttpResponse(content_type='text/csv')
+                        response['Content-Disposition'] = 'attachment; filename="Records.csv" '
+                        writer = csv.writer(response, csv.excel)
+                        response.write(u'\ufeff'.encode('utf8'))
+                        csv_header = [
+                            smart_str(u'Date'),
+                            smart_str(u'Morning_Cash'),
+                            smart_str(u'Dusk_Cash'),
+                            smart_str(u'Night_Cash'),
+                            smart_str(u'Morning_Card'),
+                            smart_str(u'Dusk_Card'),
+                            smart_str(u'Night_Card'),
+                            smart_str(u'Morning_exp'),
+                            smart_str(u'Dusk_exp'),
+                            smart_str(u'Night_exp'),
+                            smart_str(u'Morning_iou'),
+                            smart_str(u'Dusk_iou'),
+                            smart_str(u'Night_iou'),
+                            smart_str(u'Board_Game_Cash'),
+                            smart_str(u'Board_Game_Card'),
+                        ]
+                        print('header writing .. ')
+                        writer.writerow(csv_header)
+                        print('body writing .. ')
+
+                        last_item_date = ''  # Initialize
+                        idx = 0
+                        display_len = len(display)
+                        while idx < display_len:
+                            if display[idx]['date'] == last_item_date:
+                                idx += 1
+                                continue
+                            else:
+                                if idx + 1 >= display_len or idx + 2 >= display_len:
+                                    break
+                                write_row = [
+                                    display[idx]['date'],
+                                    display[idx]['cash'],
+                                    display[idx + 1]['cash'],
+                                    display[idx + 2]['cash'],
+                                    display[idx]['card'],
+                                    display[idx + 1]['card'],
+                                    display[idx + 2]['card'],
+                                    display[idx]['receipts'],
+                                    display[idx + 1]['receipts'],
+                                    display[idx + 2]['receipts'],
+                                    display[idx]['IOU'],
+                                    display[idx + 1]['IOU'],
+                                    display[idx + 2]['IOU'],
+                                ]
+                                last_item_date = display[idx]['date']
+                                writer.writerow(write_row)
+                                idx += 1
+                        return response
+
                     return render(request, 'query.html', {
                         'form': form,
                         'result': display,
@@ -327,6 +405,7 @@ def salary(request):
                     )
                     display_dict = {
                         'staff': myStaffSalary.username.username,
+                        'hours': myStaffSalary.hours,
                         'basic_salary': myStaffSalary.basic_salary,
                         'bonus_salary': myStaffSalary.bonus_salary,
                         'total_salary': myStaffSalary.total_salary,
@@ -348,6 +427,7 @@ def salary(request):
                         )
 
                         # Each Shift Salary
+                        total_hours = 0
                         for record in records:
                             turnover = record.machine
                             weekday = record.created_time.isoweekday()
@@ -369,10 +449,12 @@ def salary(request):
                             user_basic_salary += basic_salary
                             user_bonus_salary += bonus_salary
                             user_shifts = user_shifts + '; ' + shift
+                            total_hours += hours
 
                         user_total_salary = user_basic_salary + user_bonus_salary
                         display_dict = {
                             'staff': user,
+                            'hours': total_hours,
                             'basic_salary': user_basic_salary,
                             'bonus_salary': user_bonus_salary,
                             'total_salary': user_total_salary,
@@ -403,6 +485,7 @@ def salary(request):
                         )
                         display_dict = {
                             'staff': myStaffSalary.username.username,
+                            'hours': myStaffSalary.hours,
                             'basic_salary': myStaffSalary.basic_salary,
                             'bonus_salary': myStaffSalary.bonus_salary,
                             'total_salary': myStaffSalary.total_salary,
@@ -459,10 +542,12 @@ def query_salary(request):
                     created_time__gte=start_date,
                     created_time__lte=end_date,
                 )
-            results = results.order_by('created_time').reverse()
+            results = results.order_by('created_time')
             display = []
+            export_data = []
 
             for result in results:
+                export_staff_salary = []
                 item_dict = {}
                 item_dict['start'] = result.start_date
                 item_dict['createTime'] = result.created_time
@@ -473,6 +558,32 @@ def query_salary(request):
                 item_dict['actual'] = result.actual_salary
                 item_dict['comments'] = result.comments
                 display.append(item_dict)
+
+            if request.POST.get('submit', None) == '导出记录':
+                print("log export")
+                for result in results:
+                    export_staff_salary = StaffSalary.objects.filter(belongs_to=result)
+                    export_data.append(export_staff_salary)
+
+                response = HttpResponse(content_type='text/csv')
+                response['Content-Disposition'] = 'attachment; filename="Records.csv" '
+                writer = csv.writer(response, csv.excel)
+                response.write(u'\ufeff'.encode('utf8'))
+                csv_header = [smart_str(u"Issued_Date"), smart_str(u"Mon_Date"), smart_str(u"Sun_Date"), smart_str(u"Total_Wages")]
+                staff_list = myutils.queryset_all_recent_users(start_date)
+                for staff_name in staff_list:
+                    csv_header.append(staff_name.username)
+                writer.writerow(csv_header)
+                for idx, export_staff in enumerate(export_data):
+                    write_row = [results[idx].created_time, results[idx].start_date, results[idx].start_date + timedelta(days=6), results[idx].total_salary]
+                    for staff in staff_list:
+                        try:
+                            write_row.append(export_staff.get(username=staff).total_salary)
+                        except:
+                            write_row.append(Decimal(0))
+                    writer.writerow(write_row)
+                return response
+
             return render(request, 'paid.html', {
                 'form': form,
                 'result': display,
